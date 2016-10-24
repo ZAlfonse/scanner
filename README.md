@@ -1,4 +1,6 @@
-# scanner
+# Scanner
+Scans a cidr block and attempts to open tcp connections on a given port, gives you a result of alive hosts
+
 Reqs
 ==
 If you don't have go you can follow the getting started guide [here](https://golang.org/doc/install)
