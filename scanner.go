@@ -9,8 +9,6 @@ import (
 )
 
 func main() {
-  //parallelPtr := flag.Int("parallel", 1, "Amount of parallelization")
-  //blockFilePtr := flag.String("cidrBlockFiles", "cidrs.txt", "CIDR blocks to scan, one per line.")
   blockPtr := flag.String("cidrBlock", "10.0.0.0/8", "CIDR block to scan")
   portPtr := flag.Int("port", 23, "Target port")
   timeoutPtr := flag.Int("timeout", 10, "Time (ms) to wait for established TCP connection")
