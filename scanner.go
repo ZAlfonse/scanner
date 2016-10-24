@@ -29,7 +29,7 @@ func scanCidr(block *string, port *int, timeout *int, verbose *bool) {
   numip := 0
   onlineip := 0
   for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
-    conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, *port), time.Duration(*timeout) * time.Millisecond)
+  	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, *port), time.Duration(*timeout) * time.Millisecond)
     if err == nil {
       fmt.Println(ip, "online")
       onlineip += 1
@@ -47,10 +47,10 @@ func scanCidr(block *string, port *int, timeout *int, verbose *bool) {
 }
 
 func inc(ip net.IP) {
-	for j := len(ip)-1; j>=0; j-- {
-		ip[j]++
-		if ip[j] > 0 {
-			break
-		}
-	}
+  for j := len(ip)-1; j>=0; j-- {
+    ip[j]++
+    if ip[j] > 0 {
+      break
+    }
+  }
 }
