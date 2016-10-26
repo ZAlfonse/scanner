@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net"
-	"os"
 	"time"
 )
 
@@ -15,15 +13,21 @@ func main() {
 	timeoutPtr := flag.Int("timeout", 10, "Time (ms) to wait for established TCP connection")
 	debugPtr := flag.Bool("v", false, "Extra debug info")
 	tracePtr := flag.Bool("vv", false, "Print everything")
+	quietPtr := flag.Bool("q", false, "Be quieter")
+	silentPtr := flag.Bool("qq", false, "Be silent")
 
 	flag.Parse()
 
 	if *tracePtr {
-		initLogger(os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stderr)
+		initLogger(TRACE)
 	} else if *debugPtr {
-		initLogger(ioutil.Discard, os.Stdout, os.Stdout, os.Stdout, os.Stdout, os.Stderr)
+		initLogger(DEBUG)
+	} else if *quietPtr {
+		initLogger(QUIET)
+	} else if *silentPtr {
+		initLogger(SILENT)
 	} else {
-		initLogger(ioutil.Discard, ioutil.Discard, os.Stdout, os.Stdout, os.Stdout, os.Stderr)
+		initLogger(INFO)
 	}
 
 	scanCidr(blockPtr, portPtr, timeoutPtr)
