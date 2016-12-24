@@ -5,29 +5,31 @@ import (
 	"fmt"
 	"net"
 	"time"
+
+	"github.com/zalfonse/lumber"
 )
+
+var logger *lumber.Logger
 
 func main() {
 	blockPtr := flag.String("cidrBlock", "10.0.0.0/8", "CIDR block to scan")
 	portPtr := flag.Int("port", 22, "Target port")
 	timeoutPtr := flag.Int("timeout", 10, "Time (ms) to wait for established TCP connection")
-	debugPtr := flag.Bool("v", false, "Extra debug info")
-	tracePtr := flag.Bool("vv", false, "Print everything")
-	quietPtr := flag.Bool("q", false, "Be quieter")
-	silentPtr := flag.Bool("qq", false, "Be silent")
+	loglevelPtr := flag.String("loglevel", "info", "Loglevels: trace, debug, info, quiet, silent")
 
 	flag.Parse()
 
-	if *tracePtr {
-		initLogger(TRACE)
-	} else if *debugPtr {
-		initLogger(DEBUG)
-	} else if *quietPtr {
-		initLogger(QUIET)
-	} else if *silentPtr {
-		initLogger(SILENT)
-	} else {
-		initLogger(INFO)
+	switch *loglevelPtr {
+	case "trace":
+		logger = lumber.NewLogger(lumber.TRACE)
+	case "debug":
+		logger = lumber.NewLogger(lumber.DEBUG)
+	case "quiet":
+		logger = lumber.NewLogger(lumber.QUIET)
+	case "silent":
+		logger = lumber.NewLogger(lumber.SILENT)
+	default:
+		logger = lumber.NewLogger(lumber.INFO)
 	}
 
 	scanCidr(blockPtr, portPtr, timeoutPtr)
@@ -36,23 +38,23 @@ func main() {
 func scanCidr(block *string, port *int, timeout *int) {
 	startIP, ipnet, err := net.ParseCIDR(*block)
 	if err != nil {
-		errorLog.Println(err)
+		logger.Error(err)
 	}
 	numip := 0
 	onlineip := 0
 	for ip := startIP.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
 		conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", ip, *port), time.Duration(*timeout)*time.Millisecond)
 		if err == nil {
-			successLog.Println(ip, " online")
+			logger.Success(ip, " online")
 			onlineip++
 			conn.Close()
 		} else {
-			debugLog.Println(ip, " offline")
+			logger.Debug(ip, " offline")
 		}
 		numip++
 	}
-	infoLog.Println("Scanned addresses: ", numip)
-	successLog.Println("Online addresses: ", onlineip)
+	logger.Info("Scanned addresses: ", numip)
+	logger.Success("Online addresses: ", onlineip)
 }
 
 func inc(ip net.IP) {
